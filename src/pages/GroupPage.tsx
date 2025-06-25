@@ -1,5 +1,4 @@
-import React, {memo, useEffect, useState} from 'react';
-import {CommonPageProps} from './types';
+import { useEffect, useState} from 'react';
 import {Col, Row} from 'react-bootstrap';
 import {useParams} from 'react-router-dom';
 import {ContactDto} from 'src/types/dto/ContactDto';
@@ -7,26 +6,36 @@ import {GroupContactsDto} from 'src/types/dto/GroupContactsDto';
 import {GroupContactsCard} from 'src/components/GroupContactsCard';
 import {Empty} from 'src/components/Empty';
 import {ContactCard} from 'src/components/ContactCard';
+import { useFetchData } from 'src/hooks';
+import { fetchGroups } from 'src/store/actions/groupsActions';
+import { fetchContacts } from 'src/store/actions/contactActions';
+import { contactSelector, groupsSelector } from 'src/store/selectors/selectors';
+import { useAppSelector } from 'src/store/store';
 
-export const GroupPage = memo<CommonPageProps>(({
-  contactsState,
-  groupContactsState
-}) => {
+export const GroupPage = () => {
   const {groupId} = useParams<{ groupId: string }>();
-  const [contacts, setContacts] = useState<ContactDto[]>([]);
+  const [filteredContacts, setFilteredContacts] = useState<ContactDto[]>([]);
+  const { contacts, loading, error } = useAppSelector(contactSelector);
+  const { groups, loading: groupsLoading, error: groupsError } = useAppSelector(groupsSelector);
+  
+  useFetchData([fetchContacts, fetchGroups]);
+  
   const [groupContacts, setGroupContacts] = useState<GroupContactsDto>();
 
   useEffect(() => {
-    const findGroup = groupContactsState[0].find(({id}) => id === groupId);
+    const findGroup = groups.find(({id}) => id === groupId);
     setGroupContacts(findGroup);
-    setContacts(() => {
+    setFilteredContacts(() => {
       if (findGroup) {
-        return contactsState[0].filter(({id}) => findGroup.contactIds.includes(id))
+        return contacts.filter(({id}) => findGroup.contactIds.includes(id))
       }
       return [];
     });
   }, [groupId]);
 
+
+  if (loading || groupsLoading) return <div>Loading...</div>;
+  if (error || groupsError) return <div>Error: {error}</div>;
   return (
     <Row className="g-4">
       {groupContacts ? (
@@ -40,7 +49,7 @@ export const GroupPage = memo<CommonPageProps>(({
           </Col>
           <Col>
             <Row xxl={4} className="g-4">
-              {contacts.map((contact) => (
+              {filteredContacts.map((contact) => (
                 <Col key={contact.id}>
                   <ContactCard contact={contact} withLink />
                 </Col>
@@ -51,4 +60,4 @@ export const GroupPage = memo<CommonPageProps>(({
       ) : <Empty />}
     </Row>
   );
-});
+}

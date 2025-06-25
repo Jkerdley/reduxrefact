@@ -1,6 +1,5 @@
 import {Outlet, useLocation} from 'react-router-dom';
 import {Col, Container, Row} from 'react-bootstrap';
-import React from 'react';
 import {MainMenu} from './MainMenu';
 import {Breadcrumbs} from 'src/components/Breadcrumbs';
 
@@ -22,7 +21,6 @@ export const Layout = () => {
         </Col>
         <Col xxl={12}>
           <footer>
-
           </footer>
         </Col>
       </Row>
