@@ -1,2 +1,2 @@
-export { useFetchData } from "./useFetchData";
-export { useFilteredContacts} from "./useFilteredContacts";
+export { useFilteredContacts } from "./useFilteredContacts";
+export { useAppDispatch, useAppSelector } from "./hooks";
